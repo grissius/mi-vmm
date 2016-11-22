@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
-import { searchPhotos } from '../../services/Flickr';
+import React, {Component} from 'react'
+import {searchPhotos} from '../../services/Flickr';
 import _ from 'lodash';
-import { Grid, Icon, Input, Message } from 'semantic-ui-react';
+import {Container, Grid, Icon, Form, Message, Header, Segment} from 'semantic-ui-react';
+import {CirclePicker} from 'react-color';
 import ImageGallery from '../ImageGallery/ImageGallery';
 
 export default class SearchForm extends Component {
@@ -41,17 +42,28 @@ export default class SearchForm extends Component {
     render() {
         return (
             <div>
-                <Input icon>
-                    <input onChange={this.onChange} placeholder='Search...' ref="query" />
-                    <Icon name='search' />
-                </Input>
-                {this.renderError()}
+                <Container text textAlign={'center'}>
+                    <Segment padded basic>
+                        <Form>
+                            <Form.Field inline>
+                                <Form.Input icon size={'big'}>
+                                    <input onChange={this.onChange} placeholder='Search...' ref="query"/>
+                                    <Icon name='search'/>
+                                </Form.Input>
+                            </Form.Field>
+                            <CirclePicker />
+                        </Form>
+                        {this.renderError()}
+                    </Segment>
+                </Container>
                 <Grid columns='two' divided>
                     <Grid.Row>
                         <Grid.Column>
-                            <ImageGallery images={this.state.images} />
+                            <Header as='h3' icon textAlign='center' content='Query relevance'/>
+                            <ImageGallery images={this.state.images}/>
                         </Grid.Column>
                         <Grid.Column>
+                            <Header as='h3' icon textAlign='center' content='Color rerank'/>
                             ...
                         </Grid.Column>
                     </Grid.Row>

@@ -22,3 +22,9 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.circle-picker {
+  /*margin: auto !important;*/
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
