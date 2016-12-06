@@ -1,7 +1,7 @@
 import convert from 'color-convert';
 
 export function rgbL2(colora, colorb) {
-    var sum = Math.pow(colora.r-colorb.r, 2) + Math.pow(colora.g-colorb.g, 2) + Math.pow(colora.b-colorb.b, 2);
+    var sum = Math.pow(colora[0]-colorb[0], 2) + Math.pow(colora[1]-colorb[1], 2) + Math.pow(colora[2]-colorb[2], 2);
     return Math.sqrt(sum);
 }
 
