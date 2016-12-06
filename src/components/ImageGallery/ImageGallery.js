@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Image, Modal} from 'semantic-ui-react';
+import { stealColors } from '../../services/ColorThief'
 import _ from 'lodash';
 
 export default class ImageGallery extends Component {
@@ -31,7 +32,8 @@ export default class ImageGallery extends Component {
     }
 
     rerank() {
-        _.map(this.props.images, image => image.dominantColor = [1,1,1]);
+        stealColors(this.props.images)
+            .then(colors => _.map(colors, (color, index) => this.props.images[index].dominantColor = color));
         console.log(this.props.images);
     }
 }
