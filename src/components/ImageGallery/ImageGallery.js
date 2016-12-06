@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
-import { Image, Modal, Header} from 'semantic-ui-react';
+import { Image, Modal} from 'semantic-ui-react';
+import _ from 'lodash';
 
 export default class ImageGallery extends Component {
     static propTypes = {
@@ -15,9 +16,9 @@ export default class ImageGallery extends Component {
     renderImages() {
         return this.props.images.slice(this.props.offset, this.props.limit)
             .map(image => {
-                return <Modal trigger={<Image src={image} role="presentation" key={image} />} dimmer={'blurring'} basic size='small'>
+                return <Modal trigger={<Image src={image.url} role="presentation" />} key={image.url} dimmer={'blurring'} basic size='small'>
                     <Modal.Content>
-                        <Image centered src={image.replace('_q.jpg', '.jpg')} role="presentation" key={image} />
+                        <Image centered src={image.url.replace('_q.jpg', '.jpg')} role="presentation" />
                     </Modal.Content>
                 </Modal>
             });
@@ -27,5 +28,10 @@ export default class ImageGallery extends Component {
         return (<Image.Group>
             {this.renderImages()}
         </Image.Group>)
+    }
+
+    rerank() {
+        _.map(this.props.images, image => image.dominantColor = [1,1,1]);
+        console.log(this.props.images);
     }
 }

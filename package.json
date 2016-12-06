@@ -6,6 +6,7 @@
     "react-scripts": "0.7.0"
   },
   "dependencies": {
+    "color-convert": "^1.8.2",
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.2",
     "querystring": "^0.2.0",
