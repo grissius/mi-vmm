@@ -1,23 +1,22 @@
 import React, { Component, PropTypes } from 'react';
-import { Image, Modal} from 'semantic-ui-react';
+import convert from 'color-convert';
+import { Image, Modal, Label} from 'semantic-ui-react';
 
 export default class ImageGallery extends Component {
     static propTypes = {
         images: PropTypes.array.isRequired,
-        limit: PropTypes.number.isRequired,
-        offset: PropTypes.number.isRequired,
     };
     static defaultProps = {
         images: [],
-        limit: 100,
-        offset: 0
     };
     renderImages() {
-        return this.props.images.slice(this.props.offset, this.props.limit)
+        return this.props.images
             .map(image => {
+                const hexDominant = `#${convert.rgb.hex(image.dominantColor)}`;
                 return <Modal trigger={<Image src={image.url} role="presentation" />} key={image.url} dimmer={'blurring'} basic size='small'>
                     <Modal.Content>
                         <Image centered src={image.url.replace('_q.jpg', '.jpg')} role="presentation" />
+                        <div style={{backgroundColor: hexDominant, width: '100px', height: '100px'}}>{hexDominant}</div>
                     </Modal.Content>
                 </Modal>
             });

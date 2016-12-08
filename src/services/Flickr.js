@@ -14,7 +14,7 @@ const base = {
     }
 }
 
-export function searchPhotos(query) {
+export function searchPhotos(query, limit) {
     return callApi(null, {
         qs: {
             text: query,
@@ -22,7 +22,7 @@ export function searchPhotos(query) {
             sort: 'relevance'
         }
     })
-        .then(response => response.photos.photo);
+        .then(response => response.photos.photo.slice(0, limit));
 }
 
 
