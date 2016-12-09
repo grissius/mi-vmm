@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {searchPhotos} from '../../services/Flickr';
 import _ from 'lodash';
-import {Container, Grid, Icon, Form, Message, Header, Segment} from 'semantic-ui-react';
+import {Container, Grid, Icon, Form, Message, Header, Segment, Loader, Dimmer} from 'semantic-ui-react';
 import {CirclePicker} from 'react-color';
 import ImageGallery from '../ImageGallery/ImageGallery';
 import {stealColors} from '../../services/ColorThief'
@@ -22,36 +22,48 @@ export default class SearchForm extends Component {
             color: {},
             query: '',
             limit: 10,
-            call: Promise.resolve([])
+            isReranking: false,
+            isFlickering: false,
         }
     }
 
     onFlickerChange() {
         const query = this.state.query;
+        const limit = this.state.limit;
+        let lastTime = new Date().getTime();
+        const timestamp = () => {
+            let now = new Date().getTime();
+            let len = now - lastTime;
+            lastTime = now;
+            return len;
+        };
         const isCurrent = () => this.state.query === query;
         const E_INVALID = 'E_INVALID';
+        this.setState({isFlickering: true, isReranking: true,});
         searchPhotos(this.refs.query.value, this.state.limit)
             .then(response => {
                 return _.map(response, image => ((image.url = `http://farm${image.farm}.staticflickr.com/${image.server}/${image.id}_${image.secret}_q.jpg`, image)));
             })
             .then(images => {
-                if(!isCurrent()) {
+                if (!isCurrent()) {
                     throw new Error(E_INVALID);
                 }
-                this.setState({images});
+                this.setState({images, isFlickering: false});
                 return images;
             })
+            .then(images => (console.info(query, limit, this.state.color.hex, 'fetch done', timestamp()), images))
             .then(this.dominantColors)
+            .then(images => (console.info(query, limit, this.state.color.hex, 'dominant done', timestamp()), images))
             .then(images => this.rerank(images, this.state.color))
             .then(images => {
-                if(isCurrent()) {
+                if (isCurrent()) {
                     this.setState({images});
                 }
-                console.debug('query done', query, this.state.query, images);
+                console.info(query, limit, this.state.color.hex, 'rerank done', timestamp());
                 return images;
             })
             .catch(e => {
-                if(e.message !== E_INVALID) {
+                if (e.message !== E_INVALID) {
                     console.error(e);
                     this.setState({
                         error: e.message,
@@ -89,6 +101,7 @@ export default class SearchForm extends Component {
     }
 
     dominantColors(images) {
+        this.setState({isReranking: true});
         return stealColors(images)
             .then(colors =>
                 // assign dominant
@@ -97,7 +110,7 @@ export default class SearchForm extends Component {
     }
 
     rerank(images, color) {
-        console.debug('rerank', color);
+        this.setState({isReranking: true});
         if (!_.isEmpty(color)) {
             // compute distance
             let userColor = [color.rgb.r, color.rgb.g, color.rgb.b];
@@ -105,6 +118,7 @@ export default class SearchForm extends Component {
         } else {
             console.warn('No color selected, rerank skipped!');
         }
+        this.setState({isReranking: false});
         return images;
     }
 
@@ -134,11 +148,22 @@ export default class SearchForm extends Component {
                     <Grid.Row>
                         <Grid.Column>
                             <Header as='h3' icon textAlign='center' content='Query relevance'/>
-                            <ImageGallery key={this.state.query} images={this.state.images} ref="flickrGallery"/>
+                            <Segment basic>
+                                <Dimmer inverted active={this.state.isFlickering}>
+                                    <Loader size='large'>Loading</Loader>
+                                </Dimmer>
+                                <ImageGallery key={this.state.query} images={this.state.images} ref="flickrGallery"/>
+                            </Segment>
                         </Grid.Column>
                         <Grid.Column>
                             <Header as='h3' icon textAlign='center' content='Color rerank'/>
-                            <ImageGallery key={this.state.query} images={_.sortBy(this.state.images, ['distance'])} ref="rerankGallery"/>
+                            <Segment basic>
+                                <Dimmer inverted active={this.state.isReranking}>
+                                    <Loader size='large'>Loading</Loader>
+                                </Dimmer>
+                                <ImageGallery key={this.state.query} images={_.sortBy(this.state.images, ['distance'])}
+                                              ref="rerankGallery"/>
+                            </Segment>
                         </Grid.Column>
                     </Grid.Row>
                 </Grid>

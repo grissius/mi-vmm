@@ -22,11 +22,10 @@ export function callApi(uri, _params) {
     const params = _.merge({}, _params, base);
     const fetchUri = `${base.uri}${uri || ''}?${querystring.stringify(params.qs)}`;
     console.debug(`Calling ${fetchUri}`);
-    console.log(fetchUri, params);
     return fetch(fetchUri, params)
         .then(res => res.json())
         .catch(err => {
             console.error(`${fetchUri} failed: ${err.message}`);
-            throw err;
+            throw new Error('Failed to fetch colors from server.');
         })
 }
