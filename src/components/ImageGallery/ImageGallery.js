@@ -16,7 +16,8 @@ export default class ImageGallery extends Component {
                 return <Modal trigger={<Image src={image.url} role="presentation" />} key={image.url} dimmer={'blurring'} basic size='small'>
                     <Modal.Content>
                         <Image centered src={image.url.replace('_q.jpg', '.jpg')} role="presentation" />
-                        <div style={{backgroundColor: hexDominant, width: '100px', height: '100px'}}>{hexDominant}</div>
+                        <br/>
+                        <div className="ui circular centered image" style={{backgroundColor: hexDominant, width: '100px', height: '100px', paddingTop: '40px', textAlign: 'center'}}>{hexDominant}</div>
                     </Modal.Content>
                 </Modal>
             });
