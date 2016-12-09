@@ -5,7 +5,7 @@ import {Container, Grid, Icon, Form, Message, Header, Segment, Loader, Dimmer} f
 import {CirclePicker} from 'react-color';
 import ImageGallery from '../ImageGallery/ImageGallery';
 import {stealColors} from '../../services/ColorThief'
-import {rgbL2} from '../../services/Colors'
+import {dECie76} from '../../services/Colors'
 
 export default class SearchForm extends Component {
     constructor(props) {
@@ -114,7 +114,7 @@ export default class SearchForm extends Component {
         if (!_.isEmpty(color)) {
             // compute distance
             let userColor = [color.rgb.r, color.rgb.g, color.rgb.b];
-            _.map(images, (image) => image.distance = rgbL2(image.dominantColor, userColor));
+            _.map(images, (image) => image.distance = dECie76(image.dominantColor, userColor));
         } else {
             console.warn('No color selected, rerank skipped!');
         }
@@ -134,12 +134,18 @@ export default class SearchForm extends Component {
                                            value={this.state.query}/>
                                     <Icon name='search'/>
                                 </Form.Input>
-                                <Form.Input>
+                            </Form.Field>
+                            <Form.Field inline>
+
+                                <CirclePicker color={ this.state.color} onChangeComplete={this.onColorChange}/>
+                            </Form.Field>
+                            <Form.Field inline>
+
+                            <Form.Input>
                                     <input onChange={this.onLimitChange} value={this.state.limit} placeholder='Limit'
                                            ref="limit"/>
                                 </Form.Input>
                             </Form.Field>
-                            <CirclePicker color={ this.state.color} onChangeComplete={this.onColorChange}/>
                         </Form>
                         {this.renderError()}
                     </Segment>
