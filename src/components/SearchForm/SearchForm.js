@@ -39,6 +39,9 @@ export default class SearchForm extends Component {
         };
         const isCurrent = () => this.state.query === query;
         const E_INVALID = 'E_INVALID';
+        if(!this.refs.query.value || this.refs.query.value === '') {
+            return;
+        }
         this.setState({isFlickering: true, isReranking: true,});
         searchPhotos(this.refs.query.value, this.state.limit)
             .then(response => {
@@ -51,9 +54,9 @@ export default class SearchForm extends Component {
                 this.setState({images, isFlickering: false});
                 return images;
             })
-            .then(images => (console.info(query, limit, this.state.color.hex, 'fetch done', timestamp()), images))
+            .then(images => ((console.info(query, limit, this.state.color.hex, 'fetch done', timestamp()), images)))
             .then(this.dominantColors)
-            .then(images => (console.info(query, limit, this.state.color.hex, 'dominant done', timestamp()), images))
+            .then(images => ((console.info(query, limit, this.state.color.hex, 'dominant done', timestamp()), images)))
             .then(images => this.rerank(images, this.state.color))
             .then(images => {
                 if (isCurrent()) {
@@ -105,7 +108,7 @@ export default class SearchForm extends Component {
         return stealColors(images)
             .then(colors =>
                 // assign dominant
-                _.map(images, (image, index) => _.assign(_.cloneDeep(image), {dominantColor: colors[index]}))
+                _.map(images, (image, index) => _.assign(_.cloneDeep(image), {dominantColors: colors[index]}))
             )
     }
 
@@ -114,7 +117,8 @@ export default class SearchForm extends Component {
         if (!_.isEmpty(color)) {
             // compute distance
             let userColor = [color.rgb.r, color.rgb.g, color.rgb.b];
-            _.map(images, (image) => image.distance = dECie76(image.dominantColor, userColor));
+            _.map(images, (image) => image.distances = _.map(image.dominantColors, color => dECie76(color, userColor)));
+            _.map(images, (image) => image.minDistance = _.min(image.distances));
         } else {
             console.warn('No color selected, rerank skipped!');
         }
@@ -136,7 +140,6 @@ export default class SearchForm extends Component {
                                 </Form.Input>
                             </Form.Field>
                             <Form.Field inline>
-
                                 <CirclePicker color={ this.state.color} onChangeComplete={this.onColorChange}/>
                             </Form.Field>
                             <Form.Field inline>
@@ -167,7 +170,7 @@ export default class SearchForm extends Component {
                                 <Dimmer inverted active={this.state.isReranking}>
                                     <Loader size='large'>Loading</Loader>
                                 </Dimmer>
-                                <ImageGallery key={this.state.query} images={_.sortBy(this.state.images, ['distance'])}
+                                <ImageGallery key={this.state.query} images={_.sortBy(this.state.images, ['minDistance'])}
                                               ref="rerankGallery"/>
                             </Segment>
                         </Grid.Column>

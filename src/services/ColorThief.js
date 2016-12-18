@@ -12,7 +12,7 @@ const base = {
 export function stealColors(images) {
     return callApi(null, {
         qs: {
-            images: _.map(images, image => image.url)
+            'images[]': _.map(images, image => image.url)
         }
     });
 }
